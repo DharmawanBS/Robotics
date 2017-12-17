@@ -251,41 +251,49 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                                                 int val = mNXTTalker.cf_getInputValues(Sensor_nxt.port1);
                                                 lv_mpd.setValue(val);
                                                 value.setTouch1(val);
-                                                if (val == 1) show = Sensor_nxt.depan_nabrak;
+                                                if (val == 1) {
+                                                    show = Sensor_nxt.depan_nabrak;
+                                                    if (color != Color.RED) color = Color.RED;
+                                                    vibrate = true;
+                                                }
                                                 else show = "";
                                                 Log.d("value touch1",String.valueOf(val));
-                                                if (color != Color.RED) color = Color.RED;
-                                                vibrate = true;
                                                 break;
                                             case 2:
                                                 int val1 = mNXTTalker.cf_getInputValues(Sensor_nxt.port2);
                                                 lv_mpd.setValue(val1);
                                                 value.setSound(val1);
-                                                if (val1 > 50) show = show + Sensor_nxt.diklakson;
+                                                if (val1 > 50) {
+                                                    show = show + Sensor_nxt.diklakson;
+                                                    if (color != Color.RED) color = Color.YELLOW;
+                                                    vibrate = true;
+                                                }
                                                 else show = show + "";
                                                 Log.d("value sound",String.valueOf(val1));
-                                                if (color != Color.RED) color = Color.YELLOW;
-                                                vibrate = true;
                                                 break;
                                             case 3:
                                                 int val2 = mNXTTalker.cf_getInputValues(Sensor_nxt.port3);
                                                 lv_mpd.setValue(val2);
                                                 value.setLight(val2);
-                                                if (is_red()) show = show + Sensor_nxt.lampu_merah;
+                                                if (is_red()) {
+                                                    show = show + Sensor_nxt.lampu_merah;
+                                                    if (color != Color.RED) color = Color.RED;
+                                                }
                                                 else show = show + "";
                                                 Log.d("value light",String.valueOf(val2));
-                                                if (color != Color.RED) color = Color.RED;
                                                 break;
                                             case 4:
                                                 int val3 = mNXTTalker.cf_getInputValues(Sensor_nxt.port4);
                                                 lv_mpd.setValue(val3);
                                                 value.setTouch2(val3);
-                                                if (val3 == 1) show = show + Sensor_nxt.belakang_nabrak;
+                                                if (val3 == 1) {
+                                                    show = show + Sensor_nxt.belakang_nabrak;
+                                                    if (color != Color.RED) color = Color.RED;
+                                                    vibrate = true;
+                                                }
                                                 else show = show + "";
                                                 status.setText(show);
                                                 Log.d("value touch2",String.valueOf(val3));
-                                                if (color != Color.RED) color = Color.RED;
-                                                vibrate = true;
                                                 break;
                                             default:
                                                 break;

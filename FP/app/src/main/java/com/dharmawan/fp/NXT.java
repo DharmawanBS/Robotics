@@ -302,6 +302,7 @@ public class NXT {
         }
         catch(Exception e) {
             Log.d("cf_getSensorState", e.getStackTrace().toString());
+            connectionLost();
         }
         return 0;
     }
