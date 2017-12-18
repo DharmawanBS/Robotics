@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="51dp"
                 android:layout_gravity="right"
-                android:layout_weight="1"
+                android:layout_marginBottom="125dp"
                 android:text="DISCONNECT"
                 android:textSize="10dp"
                 android:visibility="gone" />
