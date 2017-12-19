@@ -22,8 +22,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +77,15 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     private String show;
     private TextView status;
+    private TextView tr_cahaya;
+    private TextView cahaya;
+    private TextView tr_suara;
+    private TextView suara;
+    private TextView orientation;
+    private EditText tr_cahaya_min;
+    private EditText tr_cahaya_max;
+    private EditText tr_suara_val;
+    private SeekBar power_seek;
     private LinearLayout background;
     private boolean vibrate;
     private int color;
@@ -134,9 +145,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         vibrate = false;
         color = Color.WHITE;
         show = Sensor_nxt.start_string;
-        status = findViewById(R.id.tv_status);
         status.setText(show);
-        background = findViewById(R.id.ll_background);
         background.setBackgroundColor(color);
     }
 
@@ -167,12 +176,15 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if(now >= -1 && now <= 1){ //lurus
             left=1;
             right=1;
+            orientation.setText("Orientasi : Lurus");
         }else if(now > 1){  // belok kanan
             left = 1;
             right = 0.5;
+            orientation.setText("Orientasi : Kanan");
         }else if(now < -1){  // belok kiri
             right =  1;
             left = 0.5;
+            orientation.setText("Orientasi : Kiri");
         }
     }
 
@@ -192,6 +204,42 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     }
 
     private void set_action() {
+        status = findViewById(R.id.tv_status);
+        tr_cahaya = findViewById(R.id.tv_cahaya_tr);
+        tr_cahaya.setText("Value threshold cahaya :");
+        cahaya = findViewById(R.id.tv_cahaya);
+        cahaya.setVisibility(View.GONE);
+        tr_suara = findViewById(R.id.tv_suara_tr);
+        tr_suara.setText("Value threshold suara :");
+        suara = findViewById(R.id.tv_suara);
+        suara.setVisibility(View.GONE);
+        orientation = findViewById(R.id.tv_orientation);
+        tr_cahaya_min = findViewById(R.id.et_cahaya_tr_min);
+        tr_cahaya_min.setText(String.valueOf(Sensor_nxt.min_red));
+        tr_cahaya_max = findViewById(R.id.et_cahaya_tr_max);
+        tr_cahaya_max.setText(String.valueOf(Sensor_nxt.max_red));
+        tr_suara_val = findViewById(R.id.et_suara_tr);
+        tr_suara_val.setText(String.valueOf(Sensor_nxt.min_suara));
+
+        background = findViewById(R.id.ll_background);
+
+        power_seek = findViewById(R.id.seekBar);
+        power_seek.setProgress(mPower);
+        power_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mPower = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
         ImageButton buttonUp = findViewById(R.id.btn_forward);
         buttonUp.setOnTouchListener(new DirectionButtonOnTouchListener(1));
         ImageButton buttonDown = findViewById(R.id.btn_backward);
@@ -204,6 +252,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                     findBrick();
                 } else {
                     mState = NXT.STATE_CONNECTED;
+                    suara.setVisibility(View.VISIBLE);
+                    cahaya.setVisibility(View.VISIBLE);
                     displayState();
                 }
             }
@@ -213,6 +263,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         mDisconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                suara.setVisibility(View.GONE);
+                cahaya.setVisibility(View.GONE);
                 robotThread.terminate();
                 mNXTTalker.stop();
                 status.setText(Sensor_nxt.start_string);
@@ -263,12 +315,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                                                 int val1 = mNXTTalker.cf_getInputValues(Sensor_nxt.port2);
                                                 lv_mpd.setValue(val1);
                                                 value.setSound(val1);
-                                                if (val1 > 50) {
+                                                if (val1 > Sensor_nxt.min_suara) {
                                                     show = show + Sensor_nxt.diklakson;
                                                     if (color != Color.RED) color = Color.YELLOW;
                                                     vibrate = true;
                                                 }
                                                 else show = show + "";
+                                                suara.setText("Value suara : "+val1);
                                                 Log.d("value sound",String.valueOf(val1));
                                                 break;
                                             case 3:
@@ -280,6 +333,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                                                     if (color != Color.RED) color = Color.RED;
                                                 }
                                                 else show = show + "";
+                                                cahaya.setText("Value cahaya : "+val2);
                                                 Log.d("value light",String.valueOf(val2));
                                                 break;
                                             case 4:
@@ -312,6 +366,15 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                                 background.setBackgroundColor(color);
                                 color = Color.WHITE;
                                 vibrate = false;
+                                if (!(tr_suara_val.getText().toString()).equals("")) {
+                                    Sensor_nxt.min_suara = Integer.parseInt(tr_suara_val.getText().toString());
+                                }
+                                if (!(tr_cahaya_min.getText().toString()).equals("")) {
+                                    Sensor_nxt.min_red = Integer.parseInt(tr_cahaya_min.getText().toString());
+                                }
+                                if (!(tr_cahaya_max.getText().toString()).equals("")) {
+                                    Sensor_nxt.max_red = Integer.parseInt(tr_cahaya_max.getText().toString());
+                                }
                             }
                             else {
                                 terminate();
@@ -331,6 +394,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             if(t == null) {
                 t = new Thread(this, threadName);
                 t.start();
+                suara.setVisibility(View.VISIBLE);
+                cahaya.setVisibility(View.VISIBLE);
             }
         }
     }

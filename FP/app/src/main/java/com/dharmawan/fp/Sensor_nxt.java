@@ -49,8 +49,9 @@ public class Sensor_nxt {
 
     public static boolean con = false;
 
-    public static final int min_red = 61;
-    public static final int max_red = 64;
+    public static int min_red = 61;
+    public static int max_red = 64;
+    public static int min_suara = 50;
 
     public static final String start_string = "Please Connect";
 }
